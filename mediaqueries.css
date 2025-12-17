@@ -1,0 +1,151 @@
+/* ============================= */
+/* TABLET / NOTEBOOK (até 1024px) */
+/* ============================= */
+@media (max-width: 1024px) {
+
+  body {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+
+  .search-field {
+    width: 60%;
+  }
+
+  .grid-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  #div13 {
+    grid-column: 1 / -1;
+  }
+
+  #div1 {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .stats-row {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .daily-title {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* ============================= */
+/* TABLET PEQUENO (até 768px) */
+/* ============================= */
+@media (max-width: 768px) {
+
+  header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 0;
+  }
+
+  #div13 {
+    height: auto;
+    min-height: 220px;
+  }
+
+  .info-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .temp-banner {
+    font-size: 36px;
+    margin-right: 0;
+  }
+
+  .temp-banner img {
+    height: 70px;
+    margin-right: 15px;
+  }
+
+  .hourly-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+
+/* ============================= */
+/* MOBILE (até 600px) */
+/* ============================= */
+@media (max-width: 600px) {
+
+  body {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-field {
+    width: 100%;
+  }
+
+  .submit-button {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  #div1,
+  #div13,
+  .stats-row,
+  .daily-title,
+  #div2,
+  #div3,
+  #div4,
+  #div5,
+  #div6,
+  #div7,
+  #div8 {
+    grid-column: 1 / -1;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+
+  #div2,
+  #div3,
+  #div4,
+  #div5,
+  #div6,
+  #div7,
+  #div8 {
+    margin-top: 0;
+  }
+
+  .units-dropdown {
+    width: 180px;
+    left: 0;
+    right: auto;
+  }
+
+  .day-select {
+    min-width: 140px;
+  }
+
+  footer {
+    font-size: 13px;
+    padding: 20px 10px;
+  }
+}

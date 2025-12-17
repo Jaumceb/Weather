@@ -4,70 +4,66 @@
 const searchInput = document.querySelector('input[name="search"]');
 const searchButton = document.querySelector('.submit-button');
 const searchSuggestions = document.querySelector('.search-suggestions');
-const dailyForecastDivs = Array.from(document.querySelectorAll('#div2, #div3, #div4, #div5, #div6, #div7, #div8'));
+const dailyForecastDivs = Array.from(
+  document.querySelectorAll('#div2, #div3, #div4, #div5, #div6, #div7, #div8')
+);
 const hourlyList = document.querySelector('.hourly-list');
-const daySelect = document.querySelector('select[name="day"]');
+
+const daySelect = document.querySelector('#daySelect');
+const selectedDaySpan = daySelect.querySelector('.selected-day');
+const dayOptions = daySelect.querySelectorAll('.day-options li');
+
 const unitsBtn = document.querySelector('.units-btn');
 const unitsDropdown = document.querySelector('.units-dropdown');
 const tempBannerH1 = document.querySelector('.temp-banner h1');
 
-// Variáveis globais para cidade e país
+// ----------------------------
+// Variáveis globais
+// ----------------------------
 let currentCity = '';
 let currentCountry = '';
 
-// ----------------------------
-// Unidades
-// ----------------------------
 let tempUnit = 'C';
 let windUnit = 'km/h';
 let precipUnit = 'mm';
-let system = 'metric'; // metric ou imperial
+let system = 'metric';
+
+let selectedDay = 'monday';
 
 // ----------------------------
-// Atualiza classes "active" nos botões
+// Botões ativos
 // ----------------------------
 function updateActiveButtons() {
   unitsDropdown.querySelectorAll('button[data-unit]').forEach(btn => {
     btn.classList.remove('active');
     const unit = btn.dataset.unit;
-    if(unit === tempUnit || unit === windUnit || unit === precipUnit) {
+    if (unit === tempUnit || unit === windUnit || unit === precipUnit) {
       btn.classList.add('active');
     }
   });
 
-  // Atualiza texto do switch
   const switchBtn = unitsDropdown.querySelector('.switch-system');
-  switchBtn.textContent = system === 'metric' ? 'Switch to Imperial' : 'Switch to Metric';
+  switchBtn.textContent =
+    system === 'metric' ? 'Switch to Imperial' : 'Switch to Metric';
 }
 
 // ----------------------------
-// Mapeamento de códigos para ícones
+// Ícones Open-Meteo
 // ----------------------------
 function getIcon(code) {
-  if(code === 0) return "icon-sunny";
-  if([1,2].includes(code)) return "icon-partly-cloudy";
-  if(code === 3) return "icon-overcast";
-  if([45,48].includes(code)) return "icon-fog";
-  if([51,53,55,56,57].includes(code)) return "icon-drizzle";
-  if([61,63,65,66,67,80,81,82].includes(code)) return "icon-rain";
-  if([71,73,75,77,85,86].includes(code)) return "icon-snow";
-  if([95,96,99].includes(code)) return "icon-storm";
+  if (code === 0) return "icon-sunny";
+  if ([1, 2].includes(code)) return "icon-partly-cloudy";
+  if (code === 3) return "icon-overcast";
+  if ([45, 48].includes(code)) return "icon-fog";
+  if ([51, 53, 55, 56, 57].includes(code)) return "icon-drizzle";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "icon-rain";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return "icon-snow";
+  if ([95, 96, 99].includes(code)) return "icon-storm";
   return "icon-sunny";
 }
 
-const weatherCodes = {
-  0: "Clear", 1: "Mainly Clear", 2: "Partly Cloudy", 3: "Overcast",
-  45: "Fog", 48: "Fog", 51: "Drizzle", 53: "Drizzle", 55: "Drizzle",
-  56: "Freezing Drizzle", 57: "Freezing Drizzle", 61: "Rain", 63: "Rain",
-  65: "Rain", 66: "Freezing Rain", 67: "Freezing Rain", 71: "Snow",
-  73: "Snow", 75: "Snow", 77: "Snow Grains", 80: "Rain Showers",
-  81: "Rain Showers", 82: "Rain Showers", 85: "Snow Showers",
-  86: "Snow Showers", 95: "Thunderstorm", 96: "Thunderstorm with hail",
-  99: "Thunderstorm with hail"
-};
-
 // ----------------------------
-// Formatar hora AM/PM
+// Hora AM/PM
 // ----------------------------
 function formatHour(hour24) {
   const period = hour24 >= 12 ? 'PM' : 'AM';
@@ -76,19 +72,25 @@ function formatHour(hour24) {
 }
 
 // ----------------------------
-// Formatação de unidades
+// Unidades
 // ----------------------------
 function formatTemp(tempC) {
-  const temp = Math.round(tempC); 
-  return tempUnit === 'C' ? `${temp}º` : `${Math.round(temp * 9/5 + 32)}º`;
+  const temp = Math.round(tempC);
+  return tempUnit === 'C'
+    ? `${temp}º`
+    : `${Math.round(temp * 9 / 5 + 32)}º`;
 }
 
 function formatWind(speedKmH) {
-  return windUnit === 'km/h' ? `${speedKmH} km/h` : `${Math.round(speedKmH / 1.609)} mph`;
+  return windUnit === 'km/h'
+    ? `${Math.round(speedKmH)} km/h`
+    : `${Math.round(speedKmH / 1.609)} mph`;
 }
 
 function formatPrecip(value) {
-  return precipUnit === 'mm' ? `${value} mm` : `${(value/25.4).toFixed(1)} in`;
+  return precipUnit === 'mm'
+    ? `${value} mm`
+    : `${(value / 25.4).toFixed(1)} in`;
 }
 
 // ----------------------------
@@ -96,22 +98,24 @@ function formatPrecip(value) {
 // ----------------------------
 async function fetchWeather(city) {
   try {
-    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en`);
+    const geoRes = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en`
+    );
     const geoData = await geoRes.json();
-    if(!geoData.results) throw new Error('City not found');
+    if (!geoData.results) throw new Error('City not found');
 
     const { latitude, longitude, name, country } = geoData.results[0];
-
     currentCity = name;
     currentCountry = country;
 
     const weatherRes = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,relative_humidity_2m,precipitation&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum&current_weather=true&timezone=auto`
     );
-    const data = await weatherRes.json();
 
+    const data = await weatherRes.json();
     window.lastWeatherData = data;
     updateUI(data);
+
   } catch (err) {
     alert(err.message);
   }
@@ -121,153 +125,182 @@ async function fetchWeather(city) {
 // Atualiza UI
 // ----------------------------
 function updateUI(data) {
-  // --- Banner principal ---
+  // Banner
   const cityDateDiv = document.querySelector('.city-date');
   const now = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
   cityDateDiv.querySelector('h2').textContent = `${currentCity}, ${currentCountry}`;
-  cityDateDiv.querySelector('h4').textContent = now.toLocaleDateString('en-US', options);
-  tempBannerH1.textContent = formatTemp(data.current_weather.temperature);
+  cityDateDiv.querySelector('h4').textContent =
+    now.toLocaleDateString('en-US', options);
 
-  // --- Daily forecast ---
+  tempBannerH1.textContent =
+    formatTemp(data.current_weather.temperature);
+
+  // Daily
   data.daily.weathercode.forEach((code, i) => {
     const div = dailyForecastDivs[i];
-    div.querySelector("img").src = `assets/images/${getIcon(code)}.webp`;
-    div.querySelector("img").alt = weatherCodes[code];
-    div.querySelector(".temp span:first-child").textContent = formatTemp(data.daily.temperature_2m_max[i]);
-    div.querySelector(".temp span:last-child").textContent = formatTemp(data.daily.temperature_2m_min[i]);
+    if (!div) return;
+
+    div.querySelector('img').src =
+      `assets/images/${getIcon(code)}.webp`;
+
+    div.querySelector('.temp span:first-child').textContent =
+      formatTemp(data.daily.temperature_2m_max[i]);
+
+    div.querySelector('.temp span:last-child').textContent =
+      formatTemp(data.daily.temperature_2m_min[i]);
   });
 
-  // --- Hourly forecast ---
-  hourlyList.innerHTML = "";
-  const selectedDay = daySelect.value.toLowerCase();
+  // Hourly
+  hourlyList.innerHTML = '';
   const weekDays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-  const dayIndex = weekDays.indexOf(selectedDay);
-  const dailyDateStr = data.daily.time[dayIndex];
-  const dailyDate = new Date(dailyDateStr);
-  dailyDate.setHours(0,0,0,0);
+  const selectedIndex = weekDays.indexOf(selectedDay);
 
-  for(let i=0; i<data.hourly.time.length; i++) {
-    const hourDate = new Date(data.hourly.time[i]);
-    if(hourDate.getFullYear() === dailyDate.getFullYear() &&
-       hourDate.getMonth() === dailyDate.getMonth() &&
-       hourDate.getDate() === dailyDate.getDate()) {
+  const selectedDate = new Date(data.daily.time[selectedIndex]);
+  selectedDate.setHours(0, 0, 0, 0);
 
-      const hour = formatHour(hourDate.getHours());
-      const temp = data.hourly.temperature_2m[i];
-      const code = data.hourly.weathercode[i];
-
-      const card = document.createElement("div");
-      card.classList.add("hour-card");
+  data.hourly.time.forEach((time, i) => {
+    const date = new Date(time);
+    if (date.toDateString() === selectedDate.toDateString()) {
+      const card = document.createElement('div');
+      card.className = 'hour-card';
       card.innerHTML = `
         <span>
-          <img src="assets/images/${getIcon(code)}.webp" alt="${weatherCodes[code]}">
-          <span class="hour">${hour}</span>
+          <img src="assets/images/${getIcon(data.hourly.weathercode[i])}.webp">
+          <span class="hour">${formatHour(date.getHours())}</span>
         </span>
-        <span class="temp">${formatTemp(temp)}</span>
+        <span class="temp">${formatTemp(data.hourly.temperature_2m[i])}</span>
       `;
       hourlyList.appendChild(card);
     }
-  }
+  });
 
-  // --- Estatísticas atuais ---
-  document.getElementById('div9').querySelector('span').textContent = formatTemp(data.current_weather.temperature);
-  document.getElementById('div10').querySelector('span').textContent = data.hourly.relative_humidity_2m ? `${data.hourly.relative_humidity_2m[0]}%` : '-';
-  document.getElementById('div11').querySelector('span').textContent = formatWind(data.current_weather.windspeed);
-  document.getElementById('div12').querySelector('span').textContent = data.daily.precipitation_sum ? formatPrecip(data.daily.precipitation_sum[0]) : '-';
+  // Stats
+  document.querySelector('#div9 span').textContent =
+    formatTemp(data.current_weather.temperature);
+
+  document.querySelector('#div10 span').textContent =
+    `${data.hourly.relative_humidity_2m[0]}%`;
+
+  document.querySelector('#div11 span').textContent =
+    formatWind(data.current_weather.windspeed);
+
+  document.querySelector('#div12 span').textContent =
+    formatPrecip(data.daily.precipitation_sum[0]);
 }
 
 // ----------------------------
 // Eventos
 // ----------------------------
-searchButton.addEventListener('click', (e) => {
+searchButton.addEventListener('click', e => {
   e.preventDefault();
-  const city = searchInput.value.trim();
-  if(city) fetchWeather(city);
+  if (searchInput.value.trim()) {
+    fetchWeather(searchInput.value.trim());
+  }
 });
 
+// Units
 unitsBtn.addEventListener('click', () => {
   unitsDropdown.parentElement.classList.toggle('open');
 });
 
 unitsDropdown.querySelectorAll('button[data-unit]').forEach(btn => {
-  btn.addEventListener('click', e => {
-    const unit = btn.dataset.unit;
-    if(['C','F'].includes(unit)) tempUnit = unit;
-    if(['km/h','mph'].includes(unit)) windUnit = unit;
-    if(['mm','in'].includes(unit)) precipUnit = unit;
+  btn.addEventListener('click', () => {
+    const u = btn.dataset.unit;
+    if (['C', 'F'].includes(u)) tempUnit = u;
+    if (['km/h', 'mph'].includes(u)) windUnit = u;
+    if (['mm', 'in'].includes(u)) precipUnit = u;
 
     updateActiveButtons();
-    if(window.lastWeatherData) updateUI(window.lastWeatherData);
+    if (window.lastWeatherData) updateUI(window.lastWeatherData);
   });
 });
 
-const switchBtn = unitsDropdown.querySelector('.switch-system');
-switchBtn.addEventListener('click', () => {
-  if(system === 'metric') {
-    system = 'imperial';
-    tempUnit = 'F';
-    windUnit = 'mph';
-    precipUnit = 'in';
-  } else {
-    system = 'metric';
-    tempUnit = 'C';
-    windUnit = 'km/h';
-    precipUnit = 'mm';
-  }
+unitsDropdown.querySelector('.switch-system')
+  .addEventListener('click', () => {
+    system = system === 'metric' ? 'imperial' : 'metric';
+    tempUnit = system === 'metric' ? 'C' : 'F';
+    windUnit = system === 'metric' ? 'km/h' : 'mph';
+    precipUnit = system === 'metric' ? 'mm' : 'in';
 
-  updateActiveButtons();
-  if(window.lastWeatherData) updateUI(window.lastWeatherData);
+    updateActiveButtons();
+    if (window.lastWeatherData) updateUI(window.lastWeatherData);
+  });
+
+// ----------------------------
+// Day select (UL / LI)
+// ----------------------------
+daySelect.addEventListener('click', e => {
+  daySelect.classList.toggle('open');
+  e.stopPropagation();
 });
 
-daySelect.addEventListener('change', () => {
-  if(window.lastWeatherData) updateUI(window.lastWeatherData);
+dayOptions.forEach(li => {
+  li.addEventListener('click', () => {
+    selectedDay = li.dataset.day;
+    selectedDaySpan.textContent = li.textContent;
+
+    dayOptions.forEach(o => o.classList.remove('active'));
+    li.classList.add('active');
+
+    daySelect.classList.remove('open');
+    if (window.lastWeatherData) updateUI(window.lastWeatherData);
+  });
+});
+
+document.addEventListener('click', () => {
+  daySelect.classList.remove('open');
 });
 
 // ----------------------------
-// Autocomplete
+// Autocomplete (APENAS 4)
 // ----------------------------
 searchInput.addEventListener('input', async () => {
   const query = searchInput.value.trim();
   searchSuggestions.innerHTML = '';
-
-  if(!query) return;
+  if (!query) return;
 
   try {
-    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=5&language=en`);
+    const res = await fetch(
+      `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=4&language=en`
+    );
     const data = await res.json();
 
-    if(data.results) {
-      data.results.forEach(city => {
+    if (data.results) {
+      data.results.slice(0, 4).forEach(city => {
         const li = document.createElement('li');
         li.textContent = `${city.name}, ${city.country}`;
-        li.addEventListener('click', () => {
+        li.onclick = () => {
           searchInput.value = city.name;
           searchSuggestions.innerHTML = '';
           fetchWeather(city.name);
-        });
+        };
         searchSuggestions.appendChild(li);
       });
     }
-  } catch (err) {
-    console.error(err);
-  }
+  } catch {}
 });
 
-// Fecha sugestões ao clicar fora
-document.addEventListener('click', (e) => {
+document.addEventListener('click', e => {
   if (!searchSuggestions.contains(e.target) && e.target !== searchInput) {
     searchSuggestions.innerHTML = '';
   }
 });
 
 // ----------------------------
-// Inicialização
+// Init
 // ----------------------------
 document.addEventListener('DOMContentLoaded', () => {
-  const weekDays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-  const todayIndex = new Date().getDay();
-  daySelect.value = weekDays[todayIndex];
+  const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+  selectedDay = days[new Date().getDay()];
+
+  dayOptions.forEach(li => {
+    if (li.dataset.day === selectedDay) {
+      li.classList.add('active');
+      selectedDaySpan.textContent = li.textContent;
+    }
+  });
+
   updateActiveButtons();
 });

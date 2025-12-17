@@ -78,10 +78,11 @@
               name="search"
               id=""
               placeholder="Search for a place..."
+              autocomplete="off"
             />
+            <ul class="search-suggestions"></ul>
           </div>
           <button class="submit-button" type="submit">Search</button>
-          <ul class="search-suggestions"></ul>
         </form>
       </section>
       <section id="grid">
@@ -90,23 +91,18 @@
             <section class="hourly">
               <span class="hourly-top">
                 <h3>Hourly forecast</h3>
-                <div class="day-select">
-                  <select name="day" id="day-select">
-                    <option value="monday">Monday</option>
-                    <option value="tuesday">Tuesday</option>
-                    <option value="wednesday">Wednesday</option>
-                    <option value="thursday">Thursday</option>
-                    <option value="friday">Friday</option>
-                    <option value="saturday">Saturday</option>
-                    <option value="sunday">Sunday</option>
-                  </select>
+                <div class="day-select" id="daySelect">
+                  <span class="selected-day">Monday</span>
 
-                  <svg width="13" height="8" viewBox="0 0 13 8">
-                    <path
-                      fill="currentColor"
-                      d="M6.309 7.484 1.105 2.316c-.175-.14-.175-.421 0-.597l.704-.668a.405.405 0 0 1 .597 0l4.219 4.148 4.184-4.148c.175-.176.457-.176.597 0l.703.668c.176.176.176.457 0 .597L6.906 7.484a.405.405 0 0 1-.597 0Z"
-                    />
-                  </svg>
+                  <ul class="day-options">
+                    <li data-day="sunday">Sunday</li>
+                    <li data-day="monday">Monday</li>
+                    <li data-day="tuesday">Tuesday</li>
+                    <li data-day="wednesday">Wednesday</li>
+                    <li data-day="thursday">Thursday</li>
+                    <li data-day="friday">Friday</li>
+                    <li data-day="saturday">Saturday</li>
+                  </ul>
                 </div>
               </span>
               <div class="hourly-list">
@@ -173,14 +169,13 @@
             <div class="info-banner">
               <div class="city-date">
                 <h2>City, County</h2>
-                <h4>Day, Month, Year </h4>
+                <h4>Day, Month, Year</h4>
               </div>
               <div class="temp-banner">
-                <img src="assets/images/icon-partly-cloudy.webp" alt="">
+                <img src="assets/images/icon-partly-cloudy.webp" alt="" />
                 <h1>20º</h1>
               </div>
             </div>
-           
           </div>
           <div class="stats-row">
             <div id="div9">
