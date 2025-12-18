@@ -1,6 +1,6 @@
 # Frontend Mentor - Weather App Solution
 
-This is a solution to the [Weather app challenge on Frontend Mentor](https://www.frontendmentor.io/challenges/weather-app-K1FhddVm49). Frontend Mentor challenges help you improve your coding skills by building realistic projects. 
+This is a solution to the [Weather app challenge on Frontend Mentor](https://www.frontendmentor.io/challenges/weather-app-K1FhddVm49). Frontend Mentor challenges help you improve your coding skills by building realistic projects.
 
 ## Table of contents
 
@@ -28,7 +28,7 @@ Users should be able to:
 - Browse a 7-day weather forecast with daily high/low temperatures and weather icons
 - View an hourly forecast showing temperature changes throughout the day
 - Switch between different days of the week using the day selector in the hourly forecast section
-- Toggle between Imperial and Metric measurement units via the units dropdown 
+- Toggle between Imperial and Metric measurement units via the units dropdown
 - Switch between specific temperature units (Celsius and Fahrenheit) and measurement units for wind speed (km/h and mph) and precipitation (millimeters) via the units dropdown
 - View the optimal layout for the interface depending on their device's screen size
 - See hover and focus states for all interactive elements on the page
@@ -39,8 +39,8 @@ Users should be able to:
 
 ### Links
 
-- Solution URL: [https://github.com/seuusuario/weather-app](https://github.com/seuusuario/weather-app)
-- Live Site URL: [https://seuprojeto.netlify.app](https://seuprojeto.netlify.app)
+- Solution URL: [https://github.com/Jaumceb/Weather](https://github.com/Jaumceb/Weather)
+- Live Site URL: [https://jcedevweather.netlify.app](https://jcedevweather.netlify.app)
 
 ## My process
 
@@ -115,3 +115,4 @@ Acknowledgments
 Thanks to the Frontend Mentor community for project feedback and inspiration.
 
 Open-Meteo API for providing reliable weather data.
+```
