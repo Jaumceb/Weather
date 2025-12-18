@@ -48,6 +48,9 @@ form input::placeholder {
   border-radius: 8px;
   cursor: pointer;
 }
+.submit-button:hover {
+background-color: var(--blue-700);
+}
 .search-suggestions {
   position: absolute;
   top: 100%;
