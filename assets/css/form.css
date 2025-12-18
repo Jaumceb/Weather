@@ -1,0 +1,76 @@
+@import url(base.css);
+.title-main {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 46px;
+}
+form {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.search-field {
+  position: relative;
+  display: flex;
+  background-color: var(--neutral-700);
+  align-items: center;
+  width: 35%;
+  padding-left: 15px;
+  border-radius: 8px;
+}
+.search-icon {
+  color: var(--neutral-300);
+  pointer-events: none;
+}
+form input {
+  padding: 12px;
+  background: none;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: var(--font-body);
+  text-align: left;
+  outline: none;
+  color: var(--neutral-0);
+}
+form input::placeholder {
+  color: var(--neutral-300);
+}
+.submit-button {
+  background-color: var(--blue-500);
+  border: none;
+  color: var(--neutral-0);
+  font-size: 16px;
+  padding: 12px 20px;
+  margin-left: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--neutral-700);
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  color: var(--neutral-0);
+  list-style: none;
+  margin-top: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+  font-family: var(--font-body);
+  scrollbar-width: thin;
+  scrollbar-color: var(--neutral-600) var(--neutral-700);
+}
+.search-suggestions li {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.search-suggestions li:hover {
+  background-color: var(--neutral-600);
+}

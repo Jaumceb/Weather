@@ -3,18 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- displays site properly based on user's device -->
-
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
       href="./assets/images/favicon-32x32.png"
     />
-
     <title>Frontend Mentor | Weather app</title>
-
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/header.css" />
+    <link rel="stylesheet" href="assets/css/form.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/banner.css" />
+    <link rel="stylesheet" href="assets/css/hourly.css" />
+    <link rel="stylesheet" href="assets/css/daily.css" />
+    <link rel="stylesheet" href="assets/css/footer.css" />
+    <link rel="stylesheet" href="assets/css/mediaqueries.css" />
   </head>
   <body>
     <header>
@@ -85,7 +89,7 @@
           <button class="submit-button" type="submit">Search</button>
         </form>
       </section>
-      <section id="grid">
+      <section id="grid" class="grid">
         <div class="grid-container">
           <div id="div1">
             <section class="hourly">
@@ -202,100 +206,100 @@
           <div class="daily-title">
             <h3>Daily forecast</h3>
           </div>
-
-          <div id="div2">
-            <h4>Tue</h4>
-            <img
-              class="icon-down-grid"
-              src="assets/images/icon-storm.webp"
-              alt=""
-            />
-            <div class="temp">
-              <span>22º</span>
-              <span>14º</span>
+          <div class="daily-forecast">
+            <div id="div2">
+              <h4>Tue</h4>
+              <img
+                class="icon-down-grid"
+                src="assets/images/icon-storm.webp"
+                alt=""
+              />
+              <div class="temp">
+                <span>22º</span>
+                <span>14º</span>
+              </div>
             </div>
-          </div>
-          <div id="div3">
-            <h4>Wed</h4>
-            <img
-              class="icon-down-grid"
-              src="assets/images/icon-storm.webp"
-              alt=""
-            />
-            <div class="temp">
-              <span>22º</span>
-              <span>14º</span>
+            <div id="div3">
+              <h4>Wed</h4>
+              <img
+                class="icon-down-grid"
+                src="assets/images/icon-storm.webp"
+                alt=""
+              />
+              <div class="temp">
+                <span>22º</span>
+                <span>14º</span>
+              </div>
             </div>
-          </div>
-          <div id="div4">
-            <h4>Thu</h4>
-            <img
-              class="icon-down-grid"
-              src="assets/images/icon-storm.webp"
-              alt=""
-            />
-            <div class="temp">
-              <span>22º</span>
-              <span>14º</span>
+            <div id="div4">
+              <h4>Thu</h4>
+              <img
+                class="icon-down-grid"
+                src="assets/images/icon-storm.webp"
+                alt=""
+              />
+              <div class="temp">
+                <span>22º</span>
+                <span>14º</span>
+              </div>
             </div>
-          </div>
-          <div id="div5">
-            <h4>Fri</h4>
-            <img
-              class="icon-down-grid"
-              src="assets/images/icon-storm.webp"
-              alt=""
-            />
-            <div class="temp">
-              <span>22º</span>
-              <span>14º</span>
+            <div id="div5">
+              <h4>Fri</h4>
+              <img
+                class="icon-down-grid"
+                src="assets/images/icon-storm.webp"
+                alt=""
+              />
+              <div class="temp">
+                <span>22º</span>
+                <span>14º</span>
+              </div>
             </div>
-          </div>
-          <div id="div6">
-            <h4>Sat</h4>
-            <img
-              class="icon-down-grid"
-              src="assets/images/icon-storm.webp"
-              alt=""
-            />
-            <div class="temp">
-              <span>22º</span>
-              <span>14º</span>
+            <div id="div6">
+              <h4>Sat</h4>
+              <img
+                class="icon-down-grid"
+                src="assets/images/icon-storm.webp"
+                alt=""
+              />
+              <div class="temp">
+                <span>22º</span>
+                <span>14º</span>
+              </div>
             </div>
-          </div>
-          <div id="div7">
-            <h4>Sun</h4>
-            <img
-              class="icon-down-grid"
-              src="assets/images/icon-storm.webp"
-              alt=""
-            />
-            <div class="temp">
-              <span>22º</span>
-              <span>14º</span>
+            <div id="div7">
+              <h4>Sun</h4>
+              <img
+                class="icon-down-grid"
+                src="assets/images/icon-storm.webp"
+                alt=""
+              />
+              <div class="temp">
+                <span>22º</span>
+                <span>14º</span>
+              </div>
             </div>
-          </div>
-          <div id="div8">
-            <h4>Mon</h4>
-            <img
-              class="icon-down-grid"
-              src="assets/images/icon-storm.webp"
-              alt=""
-            />
-            <div class="temp">
-              <span>22º</span>
-              <span>14º</span>
+            <div id="div8">
+              <h4>Mon</h4>
+              <img
+                class="icon-down-grid"
+                src="assets/images/icon-storm.webp"
+                alt=""
+              />
+              <div class="temp">
+                <span>22º</span>
+                <span>14º</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
     </main>
-
     <footer>
       Challenge by
       <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
       Coded by <a href="#">Your Name Here</a>.
     </footer>
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
   </body>
 </html>

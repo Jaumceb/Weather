@@ -1,6 +1,3 @@
-// ----------------------------
-// Seletores
-// ----------------------------
 const searchInput = document.querySelector('input[name="search"]');
 const searchButton = document.querySelector('.submit-button');
 const searchSuggestions = document.querySelector('.search-suggestions');
@@ -17,9 +14,6 @@ const unitsBtn = document.querySelector('.units-btn');
 const unitsDropdown = document.querySelector('.units-dropdown');
 const tempBannerH1 = document.querySelector('.temp-banner h1');
 
-// ----------------------------
-// Variáveis globais
-// ----------------------------
 let currentCity = '';
 let currentCountry = '';
 
@@ -30,9 +24,6 @@ let system = 'metric';
 
 let selectedDay = 'monday';
 
-// ----------------------------
-// Botões ativos
-// ----------------------------
 function updateActiveButtons() {
   unitsDropdown.querySelectorAll('button[data-unit]').forEach(btn => {
     btn.classList.remove('active');
@@ -47,9 +38,6 @@ function updateActiveButtons() {
     system === 'metric' ? 'Switch to Imperial' : 'Switch to Metric';
 }
 
-// ----------------------------
-// Ícones Open-Meteo
-// ----------------------------
 function getIcon(code) {
   if (code === 0) return "icon-sunny";
   if ([1, 2].includes(code)) return "icon-partly-cloudy";
@@ -62,18 +50,12 @@ function getIcon(code) {
   return "icon-sunny";
 }
 
-// ----------------------------
-// Hora AM/PM
-// ----------------------------
 function formatHour(hour24) {
   const period = hour24 >= 12 ? 'PM' : 'AM';
   const hour12 = hour24 % 12 || 12;
   return `${hour12} ${period}`;
 }
 
-// ----------------------------
-// Unidades
-// ----------------------------
 function formatTemp(tempC) {
   const temp = Math.round(tempC);
   return tempUnit === 'C'
@@ -93,9 +75,6 @@ function formatPrecip(value) {
     : `${(value / 25.4).toFixed(1)} in`;
 }
 
-// ----------------------------
-// Buscar clima
-// ----------------------------
 async function fetchWeather(city) {
   try {
     const geoRes = await fetch(
@@ -121,11 +100,7 @@ async function fetchWeather(city) {
   }
 }
 
-// ----------------------------
-// Atualiza UI
-// ----------------------------
 function updateUI(data) {
-  // Banner
   const cityDateDiv = document.querySelector('.city-date');
   const now = new Date();
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -137,7 +112,6 @@ function updateUI(data) {
   tempBannerH1.textContent =
     formatTemp(data.current_weather.temperature);
 
-  // Daily
   data.daily.weathercode.forEach((code, i) => {
     const div = dailyForecastDivs[i];
     if (!div) return;
@@ -152,7 +126,6 @@ function updateUI(data) {
       formatTemp(data.daily.temperature_2m_min[i]);
   });
 
-  // Hourly
   hourlyList.innerHTML = '';
   const weekDays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
   const selectedIndex = weekDays.indexOf(selectedDay);
@@ -176,7 +149,6 @@ function updateUI(data) {
     }
   });
 
-  // Stats
   document.querySelector('#div9 span').textContent =
     formatTemp(data.current_weather.temperature);
 
@@ -190,9 +162,6 @@ function updateUI(data) {
     formatPrecip(data.daily.precipitation_sum[0]);
 }
 
-// ----------------------------
-// Eventos
-// ----------------------------
 searchButton.addEventListener('click', e => {
   e.preventDefault();
   if (searchInput.value.trim()) {
@@ -200,7 +169,6 @@ searchButton.addEventListener('click', e => {
   }
 });
 
-// Units
 unitsBtn.addEventListener('click', () => {
   unitsDropdown.parentElement.classList.toggle('open');
 });
@@ -228,9 +196,6 @@ unitsDropdown.querySelector('.switch-system')
     if (window.lastWeatherData) updateUI(window.lastWeatherData);
   });
 
-// ----------------------------
-// Day select (UL / LI)
-// ----------------------------
 daySelect.addEventListener('click', e => {
   daySelect.classList.toggle('open');
   e.stopPropagation();
@@ -253,9 +218,6 @@ document.addEventListener('click', () => {
   daySelect.classList.remove('open');
 });
 
-// ----------------------------
-// Autocomplete (APENAS 4)
-// ----------------------------
 searchInput.addEventListener('input', async () => {
   const query = searchInput.value.trim();
   searchSuggestions.innerHTML = '';
@@ -288,9 +250,6 @@ document.addEventListener('click', e => {
   }
 });
 
-// ----------------------------
-// Init
-// ----------------------------
 document.addEventListener('DOMContentLoaded', () => {
   const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
   selectedDay = days[new Date().getDay()];

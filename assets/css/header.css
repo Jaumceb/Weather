@@ -1,0 +1,87 @@
+@import url(base.css);
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px;
+}
+.units-wrapper {
+  position: relative;
+}
+.units-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--neutral-700);
+  color: var(--neutral-300);
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+}
+.units-btn .arrow {
+  margin-left: auto;
+  transition: transform 0.3s;
+}
+.units-wrapper.open .arrow {
+  transform: rotate(180deg);
+}
+.units-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--neutral-700);
+  border-radius: 10px;
+  padding: 1px;
+  width: 200px;
+  display: none;
+  z-index: 10;
+  border: 2px solid var(--neutral-600);
+}
+.units-wrapper.open .units-dropdown {
+  display: block;
+}
+.unit-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.unit-title {
+  font-size: 12px;
+  color: var(--neutral-300);
+  padding: 5px 20px;
+}
+.units-dropdown button {
+  position: relative;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--neutral-300);
+  text-align: left;
+  padding: 15px 20px 15px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+.units-dropdown button:hover {
+  background-color: #3c3a5e;
+}
+.units-dropdown button.active {
+  background-color: #2f2f49;
+  color: white;
+}
+.units-dropdown button.active::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  background-image: url("../images/icon-checkmark.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}

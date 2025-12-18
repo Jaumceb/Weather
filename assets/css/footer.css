@@ -1,0 +1,32 @@
+@import url(base.css);
+footer {
+  margin-top: 60px;
+  padding: 25px 20px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+footer::before {
+  content: "";
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: 1px;
+  margin: 0 auto 20px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--neutral-600),
+    transparent
+  );
+}
+footer a {
+  color: var(--blue-500);
+  text-decoration: none;
+  font-weight: var(--font-weight-semibold);
+  transition: color 0.2s ease;
+}
+footer a:hover {
+  color: var(--orange-500);
+  text-decoration: underline;
+}

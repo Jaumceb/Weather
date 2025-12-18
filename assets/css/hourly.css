@@ -1,0 +1,133 @@
+@import url(base.css);
+#div1 h3 {
+  font-size: 18px;
+}
+.hourly-top {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  align-items: center;
+  font-family: var(--font-body);
+}
+.day-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background-color: var(--neutral-600);
+  padding: 8px 32px 8px 12px; 
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--neutral-0);
+  cursor: pointer;
+  user-select: none;
+}
+.selected-day {
+  min-width: 90px;
+}
+.day-select::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-image: url("../images/icon-dropdown.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  pointer-events: none;
+  transition: transform 0.25s ease;
+}
+.day-select.open::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+.day-options {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background-color: #25253f;
+  border-radius: 8px;
+  list-style: none;
+  padding: 6px 0;
+  display: none;
+  z-index: 20;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+.day-select.open .day-options {
+  display: block;
+}
+.day-options li {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.day-options li:hover {
+  background-color: #2f2f49;
+}
+.day-options li.active {
+  background-color: #2f2f49;
+  position: relative;
+}
+.hourly-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 500px;
+  overflow-y: auto;
+  width: 100%;
+  scroll-behavior: smooth;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding-right: 10px;
+  box-sizing: content-box;
+}
+.hourly-list::-webkit-scrollbar {
+  width: 8px;
+}
+.hourly-list::-webkit-scrollbar-track {
+  background: #1f1f38;
+  border-radius: 8px;
+}
+.hourly-list::-webkit-scrollbar-thumb {
+  background-color: #4558d9;
+  border-radius: 8px;
+  border: 1px solid #1f1f38;
+}
+.hourly-list::-webkit-scrollbar-thumb:hover {
+  background-color: #6670ff;
+}
+.hourly-list {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(243, 23%, 30%) #25253f;
+}
+.hourly-list::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.hour-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: var(--neutral-700);
+  border: 1px solid var(--neutral-600);
+  border-radius: 8px;
+  padding: 5px;
+  text-align: center;
+}
+.hour-card span {
+  display: flex;
+  align-items: center;
+}
+.hour-card img {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 8px;
+}

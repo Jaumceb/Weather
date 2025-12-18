@@ -1,0 +1,228 @@
+@import url(base.css);
+@media (max-width: 1024px) {
+  body {
+    margin-left: 30px;
+    margin-right: 30px;
+  }
+  .grid {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+  .grid-container {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  header {
+    max-width: 1024px;
+    margin: 0 auto;
+  }
+  #div1 {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  #div13 {
+    grid-column: 1 / -1;
+  }
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-left: 35px;
+    margin-right: 35px;
+  }
+  .search-field {
+    width: 100%;
+    max-width: 420px;
+  }
+  .submit-button {
+    width: 100%;
+    max-width: 420px;
+    margin-left: 0;
+  }
+  .daily-title {
+    grid-column: 1 / 7;
+  }
+  #div2,
+  #div3,
+  #div4,
+  #div5,
+  #div6,
+  #div7,
+  #div8 {
+    min-width: 0;
+  }
+}
+@media (max-width: 900px) {
+  .daily-title {
+    font-size: 20px;
+  }
+  #div2,
+  #div3,
+  #div4,
+  #div5,
+  #div6,
+  #div7,
+  #div8 {
+    padding: 12px;
+    font-size: 14px;
+  }
+  #div2 h4,
+  #div3 h4,
+  #div4 h4,
+  #div5 h4,
+  #div6 h4,
+  #div7 h4,
+  #div8 h4 {
+    font-size: 13px;
+  }
+  #div2 span,
+  #div3 span,
+  #div4 span,
+  #div5 span,
+  #div6 span,
+  #div7 span,
+  #div8 span {
+    font-size: 18px;
+  }
+}
+@media (max-width: 768px) {
+  .daily-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .daily-forecast {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+  }
+  #div2,
+  #div3,
+  #div4,
+  #div5,
+  #div6,
+  #div7,
+  #div8 {
+    padding: 10px;
+    font-size: 13px;
+  }
+  #div2 span,
+  #div3 span,
+  #div4 span,
+  #div5 span,
+  #div6 span,
+  #div7 span,
+  #div8 span {
+    font-size: 16px;
+  }
+  body {
+    font-size: 14px;
+  }
+  .title-main {
+    font-size: 30px;
+  }
+  .temp-banner {
+    font-size: 32px;
+  }
+  .search-field input {
+    font-size: 14px;
+  }
+  #div9 span,
+  #div10 span,
+  #div11 span,
+  #div12 span {
+    font-size: 22px;
+  }
+  .daily-title {
+    font-size: 16px;
+  }
+}
+@media (max-width: 600px) {
+  footer {
+    font-size: 13px;
+    padding: 20px 10px;
+  }
+}
+@media (max-width: 480px) {
+  .daily-forecast {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+  body {
+    font-size: 13px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  #div13 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto !important;
+    min-height: unset;
+    padding: 50px 12px;
+    background-image: url(../images/bg-today-small.svg);
+  }
+  .logo {
+    margin-left: -10px;
+  }
+  .units-btn {
+    padding: 10px 10px;
+    margin-left: 10px;
+    margin-right: 0;
+  }
+  .info-banner {
+    position: relative !important; 
+    inset: auto; 
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+    text-align: center;
+  }
+  .city-date {
+    margin: 0;
+    width: 100%;
+  }
+  .city-date h2 {
+    font-size: 22px;
+  }
+  .city-date h4 {
+    font-size: 14px;
+  }
+  .temp-banner {
+    margin: 0;
+  }
+  .temp-banner h1 {
+    font-size: 78px;
+    font-weight: var(--font-weight-bold);
+  }
+  h4 {
+    font-size: 12px;
+  }
+  .daily-title {
+    margin-top: 2px;
+  }
+  .daily-title h3 {
+    font-weight: var(--font-weight-regular);
+    font-size: 16px;
+  }
+  #div1 h3 {
+    font-weight: 500;
+    font-size: 16px;
+  }
+  .day-select {
+    padding: 8px 12px 8px 12px;
+  }
+  #div9 span,
+  #div10 span,
+  #div11 span,
+  #div12 span {
+    font-size: 20px;
+  }
+}
