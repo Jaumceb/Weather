@@ -1,323 +1,194 @@
-/* =======================
-   SELECTORS
-======================= */
-const header = document.querySelector('header');
-const searchInputWrapper = document.querySelector('.search-field');
-const searchInput = document.querySelector('input[name="search"]');
-const searchButton = document.querySelector('.submit-button');
-const searchSuggestions = document.querySelector('.search-suggestions');
+import { searchPlaces, getForecast, temperature, dateLabel, hoursForDate } from './weather-api.mjs';
 
-const apiErrorSection = document.getElementById('api-error');
-const noResultsSection = document.getElementById('no-results');
-const gridSection = document.getElementById('grid');
+const input = document.querySelector('input[name="search"]');
+const suggestions = document.querySelector('.search-suggestions');
+const form = document.querySelector('form');
+const grid = document.getElementById('grid');
+const status = document.getElementById('search-status');
+const daySelect = document.getElementById('daySelect');
+const units = document.querySelector('.units-wrapper');
+const unitsButton = document.querySelector('.units-btn');
+let forecast, location, weatherRequest, suggestionRequest, timer, lastSearch;
+let searchVersion = 0;
+let suggestionVersion = 0;
+let tempUnit = 'C', windUnit = 'km/h', precipUnit = 'mm';
 
-const dailyForecastDivs = Array.from(
-  document.querySelectorAll('#div2, #div3, #div4, #div5, #div6, #div7, #div8')
-);
-const hourlyList = document.querySelector('.hourly-list');
-
-const daySelect = document.querySelector('#daySelect');
-const selectedDaySpan = daySelect.querySelector('.selected-day');
-const dayOptions = daySelect.querySelectorAll('.day-options li');
-
-const unitsBtn = document.querySelector('.units-btn');
-const unitsDropdown = document.querySelector('.units-dropdown');
-const tempBannerH1 = document.querySelector('.temp-banner h1');
-
-/* =======================
-   STATE
-======================= */
-let currentCity = '';
-let currentCountry = '';
-let tempUnit = 'C';
-let windUnit = 'km/h';
-let precipUnit = 'mm';
-let system = 'metric';
-let selectedDay = 'monday';
-
-/* =======================
-   VISIBILITY FUNCTIONS
-======================= */
-function showResults() {
-  header.classList.remove('hidden');
-  searchInputWrapper.classList.remove('hidden');
-
-  apiErrorSection.classList.add('hidden');
-  noResultsSection.classList.add('hidden');
-  gridSection.classList.remove('hidden');
+function icon(code) {
+  if (code === 0) return 'sunny';
+  if ([1, 2].includes(code)) return 'partly-cloudy';
+  if (code === 3) return 'overcast';
+  if ([45, 48].includes(code)) return 'fog';
+  if ([51, 53, 55, 56, 57].includes(code)) return 'drizzle';
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'rain';
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
+  if ([95, 96, 99].includes(code)) return 'storm';
+  return null;
 }
 
-function showNoResults() {
-  header.classList.remove('hidden');
-  searchInputWrapper.classList.remove('hidden');
-
-  apiErrorSection.classList.add('hidden');
-  gridSection.classList.add('hidden');
-  noResultsSection.classList.remove('hidden');
+function setIcon(image, code) {
+  const name = icon(code);
+  image.hidden = !name;
+  image.alt = name ? name.replaceAll('-', ' ') : '';
+  if (name) image.src = `assets/images/icon-${name}.webp`;
 }
 
-function showApiError() {
-  document.getElementById('search').classList.add('hidden');
-  searchInputWrapper.classList.add('hidden');
-  gridSection.classList.add('hidden');
-  noResultsSection.classList.add('hidden');
-
-  apiErrorSection.classList.remove('hidden');
+function closeSuggestions() {
+  clearTimeout(timer);
+  suggestionVersion++;
+  suggestionRequest?.abort();
+  suggestions.replaceChildren();
 }
 
-/* =======================
-   UNITS
-======================= */
-function updateActiveButtons() {
-  unitsDropdown.querySelectorAll('button[data-unit]').forEach(btn => {
-    btn.classList.remove('active');
-    const unit = btn.dataset.unit;
-    if (unit === tempUnit || unit === windUnit || unit === precipUnit) {
-      btn.classList.add('active');
-    }
-  });
-
-  const switchBtn = unitsDropdown.querySelector('.switch-system');
-  switchBtn.textContent =
-    system === 'metric' ? 'Switch to Imperial' : 'Switch to Metric';
+function view(state, message = '') {
+  grid.classList.toggle('hidden', state !== 'ready');
+  grid.setAttribute('aria-busy', state === 'loading');
+  document.getElementById('api-error').classList.toggle('hidden', state !== 'error');
+  document.getElementById('no-results').classList.toggle('hidden', state !== 'empty');
+  status.textContent = message;
 }
 
-/* =======================
-   HELPERS
-======================= */
-function getIcon(code) {
-  if (code === 0) return "icon-sunny";
-  if ([1, 2].includes(code)) return "icon-partly-cloudy";
-  if (code === 3) return "icon-overcast";
-  if ([45, 48].includes(code)) return "icon-fog";
-  if ([51, 53, 55, 56, 57].includes(code)) return "icon-drizzle";
-  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "icon-rain";
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return "icon-snow";
-  if ([95, 96, 99].includes(code)) return "icon-storm";
-  return "icon-sunny";
-}
-
-function formatHour(hour24) {
-  const period = hour24 >= 12 ? 'PM' : 'AM';
-  const hour12 = hour24 % 12 || 12;
-  return `${hour12} ${period}`;
-}
-
-function formatTemp(tempC) {
-  const temp = Math.round(tempC);
-  return tempUnit === 'C'
-    ? `${temp}º`
-    : `${Math.round(temp * 9 / 5 + 32)}º`;
-}
-
-function formatWind(speedKmH) {
-  return windUnit === 'km/h'
-    ? `${Math.round(speedKmH)} km/h`
-    : `${Math.round(speedKmH / 1.609)} mph`;
-}
-
-function formatPrecip(value) {
-  return precipUnit === 'mm'
-    ? `${value} mm`
-    : `${(value / 25.4).toFixed(1)} in`;
-}
-
-/* =======================
-   FETCH WEATHER
-======================= */
-async function fetchWeather(city) {
+async function loadWeather(placeOrQuery) {
+  lastSearch = placeOrQuery;
+  closeSuggestions();
+  const version = ++searchVersion;
+  weatherRequest?.abort();
+  weatherRequest = new AbortController();
+  const { signal } = weatherRequest;
+  view('loading', 'Loading weather…');
   try {
-    const geoRes = await fetch(
-      `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en`
-    );
-    const geoData = await geoRes.json();
-
-    if (!geoData.results || geoData.results.length === 0) {
-      showNoResults();
-      return;
-    }
-
-    const { latitude, longitude, name, country } = geoData.results[0];
-    currentCity = name;
-    currentCountry = country;
-
-    const weatherRes = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,relative_humidity_2m,precipitation&daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum&current_weather=true&timezone=auto`
-    );
-
-    const data = await weatherRes.json();
-
-    if (!data || !data.daily) {
-      showApiError();
-      return;
-    }
-
-    window.lastWeatherData = data;
-    showResults();
-    updateUI(data);
-
+    const place = typeof placeOrQuery === 'string' ? (await searchPlaces(placeOrQuery, signal))[0] : placeOrQuery;
+    if (version !== searchVersion) return;
+    if (!place) { view('empty'); return; }
+    const data = await getForecast(place, signal);
+    if (version !== searchVersion) return;
+    forecast = data;
+    location = place;
+    daySelect.replaceChildren(...data.daily.time.map(date => {
+      const option = document.createElement('option');
+      option.value = date;
+      option.textContent = dateLabel(date, { weekday: 'long', month: 'short', day: 'numeric' });
+      return option;
+    }));
+    render();
+    view('ready', `Weather for ${place.name}. Times shown in ${data.timezone.replaceAll('_', ' ')}.`);
   } catch {
-    showApiError();
+    if (version === searchVersion && !signal.aborted) view('error');
   }
 }
 
-/* =======================
-   UPDATE UI
-======================= */
-function updateUI(data) {
-  const cityDateDiv = document.querySelector('.city-date');
-  const now = new Date();
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
-  cityDateDiv.querySelector('h2').textContent =
-    `${currentCity}, ${currentCountry}`;
-  cityDateDiv.querySelector('h4').textContent =
-    now.toLocaleDateString('en-US', options);
-
-  tempBannerH1.textContent = formatTemp(data.current_weather.temperature);
-
-  data.daily.weathercode.forEach((code, i) => {
-    const div = dailyForecastDivs[i];
-    if (!div) return;
-
-    div.querySelector('img').src = `assets/images/${getIcon(code)}.webp`;
-    div.querySelector('.temp span:first-child').textContent =
-      formatTemp(data.daily.temperature_2m_max[i]);
-    div.querySelector('.temp span:last-child').textContent =
-      formatTemp(data.daily.temperature_2m_min[i]);
+function renderHours() {
+  const cards = hoursForDate(forecast, daySelect.value).map(hour => {
+    const card = document.createElement('div');
+    card.className = 'hour-card';
+    const label = document.createElement('span');
+    const image = document.createElement('img');
+    setIcon(image, hour.code);
+    const time = document.createElement('span');
+    const h = Number(hour.time.slice(11, 13));
+    time.textContent = `${h % 12 || 12} ${h >= 12 ? 'PM' : 'AM'}`;
+    label.append(image, time);
+    const value = document.createElement('span');
+    value.textContent = temperature(hour.temperature, tempUnit);
+    card.append(label, value);
+    return card;
   });
-
-  hourlyList.innerHTML = '';
-  const weekDays = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-  const selectedIndex = weekDays.indexOf(selectedDay);
-  const selectedDate = new Date(data.daily.time[selectedIndex]);
-  selectedDate.setHours(0,0,0,0);
-
-  data.hourly.time.forEach((time, i) => {
-    const date = new Date(time);
-    if (date.toDateString() === selectedDate.toDateString()) {
-      const card = document.createElement('div');
-      card.className = 'hour-card';
-      card.innerHTML = `
-        <span>
-          <img src="assets/images/${getIcon(data.hourly.weathercode[i])}.webp">
-          <span class="hour">${formatHour(date.getHours())}</span>
-        </span>
-        <span class="temp">${formatTemp(data.hourly.temperature_2m[i])}</span>
-      `;
-      hourlyList.appendChild(card);
-    }
-  });
-
-  document.querySelector('#div9 span').textContent =
-    formatTemp(data.current_weather.temperature);
-  document.querySelector('#div10 span').textContent =
-    `${data.hourly.relative_humidity_2m[0]}%`;
-  document.querySelector('#div11 span').textContent =
-    formatWind(data.current_weather.windspeed);
-  document.querySelector('#div12 span').textContent =
-    formatPrecip(data.daily.precipitation_sum[0]);
+  document.querySelector('.hourly-list').replaceChildren(...cards);
 }
 
-/* =======================
-   EVENTS
-======================= */
-searchButton.addEventListener('click', e => {
-  e.preventDefault();
-  if (searchInput.value.trim()) {
-    fetchWeather(searchInput.value.trim());
-  }
-});
-
-unitsBtn.addEventListener('click', () => {
-  unitsDropdown.parentElement.classList.toggle('open');
-});
-
-unitsDropdown.querySelectorAll('button[data-unit]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const u = btn.dataset.unit;
-    if (['C','F'].includes(u)) tempUnit = u;
-    if (['km/h','mph'].includes(u)) windUnit = u;
-    if (['mm','in'].includes(u)) precipUnit = u;
-    updateActiveButtons();
-    if (window.lastWeatherData) updateUI(window.lastWeatherData);
+function render() {
+  const { current, daily } = forecast;
+  document.querySelector('.city-date h2').textContent = [...new Set([location.name, location.admin1, location.country].filter(Boolean))].join(', ');
+  document.querySelector('.city-date h4').textContent = dateLabel(current.time, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.querySelector('.temp-banner h1').textContent = temperature(current.temperature_2m, tempUnit);
+  setIcon(document.querySelector('.temp-banner img'), current.weather_code);
+  document.querySelector('#div9 span').textContent = temperature(current.apparent_temperature, tempUnit);
+  document.querySelector('#div10 span').textContent = Number.isFinite(current.relative_humidity_2m) ? `${current.relative_humidity_2m}%` : '—';
+  document.querySelector('#div11 span').textContent = Number.isFinite(current.wind_speed_10m) ? `${Math.round(current.wind_speed_10m / (windUnit === 'mph' ? 1.609344 : 1))} ${windUnit}` : '—';
+  document.querySelector('#div12 span').textContent = Number.isFinite(current.precipitation) ? `${Number((current.precipitation / (precipUnit === 'in' ? 25.4 : 1)).toFixed(2))} ${precipUnit}` : '—';
+  document.querySelectorAll('.daily-forecast > div').forEach((card, index) => {
+    card.hidden = !daily.time[index];
+    if (card.hidden) return;
+    card.querySelector('h4').textContent = dateLabel(daily.time[index], { weekday: 'short' });
+    setIcon(card.querySelector('img'), daily.weather_code[index]);
+    card.querySelector('.temp span:first-child').textContent = temperature(daily.temperature_2m_max[index], tempUnit);
+    card.querySelector('.temp span:last-child').textContent = temperature(daily.temperature_2m_min[index], tempUnit);
   });
+  renderHours();
+}
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  if (input.value.trim().length >= 2) loadWeather(input.value.trim());
 });
 
-unitsDropdown.querySelector('.switch-system').addEventListener('click', () => {
-  system = system === 'metric' ? 'imperial' : 'metric';
-  tempUnit = system === 'metric' ? 'C' : 'F';
-  windUnit = system === 'metric' ? 'km/h' : 'mph';
-  precipUnit = system === 'metric' ? 'mm' : 'in';
-  updateActiveButtons();
-  if (window.lastWeatherData) updateUI(window.lastWeatherData);
-});
-
-daySelect.addEventListener('click', e => {
-  daySelect.classList.toggle('open');
-  e.stopPropagation();
-});
-
-dayOptions.forEach(li => {
-  li.addEventListener('click', () => {
-    selectedDay = li.dataset.day;
-    selectedDaySpan.textContent = li.textContent;
-    dayOptions.forEach(o => o.classList.remove('active'));
-    li.classList.add('active');
-    daySelect.classList.remove('open');
-    if (window.lastWeatherData) updateUI(window.lastWeatherData);
-  });
-});
-
-document.addEventListener('click', () => {
-  daySelect.classList.remove('open');
-});
-
-/* =======================
-   SEARCH SUGGESTIONS
-======================= */
-searchInput.addEventListener('input', async () => {
-  const query = searchInput.value.trim();
-  searchSuggestions.innerHTML = '';
-  if (!query) return;
-
-  try {
-    const res = await fetch(
-      `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=4&language=en`
-    );
-    const data = await res.json();
-    if (data.results) {
-      data.results.slice(0,4).forEach(city => {
+input.addEventListener('input', () => {
+  closeSuggestions();
+  weatherRequest?.abort();
+  searchVersion++;
+  view(forecast ? 'ready' : 'idle', 'Type a city and choose a result, or press Search.');
+  const query = input.value.trim();
+  if (query.length < 2) return;
+  const version = suggestionVersion;
+  timer = setTimeout(async () => {
+    suggestionRequest = new AbortController();
+    try {
+      const places = await searchPlaces(query, suggestionRequest.signal);
+      if (version !== suggestionVersion) return;
+      suggestions.replaceChildren(...places.map(place => {
         const li = document.createElement('li');
-        li.textContent = `${city.name}, ${city.country}`;
-        li.onclick = () => {
-          searchInput.value = city.name;
-          searchSuggestions.innerHTML = '';
-          fetchWeather(city.name);
-        };
-        searchSuggestions.appendChild(li);
-      });
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = [place.name, place.admin1, place.country].filter(Boolean).join(', ');
+        button.addEventListener('click', () => { input.value = place.name; loadWeather(place); });
+        li.append(button);
+        return li;
+      }));
+    } catch {
+      if (version === suggestionVersion) status.textContent = 'Suggestions unavailable. Press Search to try again.';
     }
-  } catch {}
+  }, 350);
 });
 
-document.addEventListener('click', e => {
-  if (!searchSuggestions.contains(e.target) && e.target !== searchInput) {
-    searchSuggestions.innerHTML = '';
+input.addEventListener('keydown', event => {
+  if (event.key === 'ArrowDown') { event.preventDefault(); suggestions.querySelector('button')?.focus(); }
+});
+daySelect.addEventListener('change', () => { renderHours(); document.querySelector('.hourly-list').scrollTop = 0; });
+
+function closeUnits() { units.classList.remove('open'); unitsButton.setAttribute('aria-expanded', 'false'); }
+unitsButton.addEventListener('click', () => { unitsButton.setAttribute('aria-expanded', units.classList.toggle('open')); });
+function updateUnits() {
+  units.querySelectorAll('[data-unit]').forEach(button => {
+    const active = [tempUnit, windUnit, precipUnit].includes(button.dataset.unit);
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active);
+  });
+  units.querySelector('.switch-system').textContent = tempUnit === 'C' && windUnit === 'km/h' && precipUnit === 'mm' ? 'Switch to Imperial' : 'Switch to Metric';
+  if (forecast) render();
+}
+units.querySelectorAll('[data-unit]').forEach(button => button.addEventListener('click', () => {
+  const value = button.dataset.unit;
+  if (['C', 'F'].includes(value)) tempUnit = value;
+  if (['km/h', 'mph'].includes(value)) windUnit = value;
+  if (['mm', 'in'].includes(value)) precipUnit = value;
+  updateUnits();
+}));
+units.querySelector('.switch-system').addEventListener('click', () => {
+  const imperial = tempUnit === 'C' && windUnit === 'km/h' && precipUnit === 'mm';
+  [tempUnit, windUnit, precipUnit] = imperial ? ['F', 'mph', 'in'] : ['C', 'km/h', 'mm'];
+  updateUnits();
+});
+document.addEventListener('click', event => {
+  if (!units.contains(event.target)) closeUnits();
+  if (!form.contains(event.target)) closeSuggestions();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    if (units.contains(document.activeElement)) unitsButton.focus();
+    if (suggestions.contains(document.activeElement)) input.focus();
+    closeUnits();
+    closeSuggestions();
   }
 });
-
-/* =======================
-   INIT
-======================= */
-document.addEventListener('DOMContentLoaded', () => {
-  const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-  selectedDay = days[new Date().getDay()];
-  dayOptions.forEach(li => {
-    if (li.dataset.day === selectedDay) {
-      li.classList.add('active');
-      selectedDaySpan.textContent = li.textContent;
-    }
-  });
-  updateActiveButtons();
-});
+document.getElementById('retry').addEventListener('click', () => loadWeather(lastSearch));
+updateUnits();
+view('idle', 'Search for a city to see its weather forecast.');

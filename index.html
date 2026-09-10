@@ -24,7 +24,7 @@
     <header>
       <img class="logo" src="assets/images/logo.svg" alt="" />
       <div class="units-wrapper">
-        <button class="units-btn">
+        <button class="units-btn" aria-expanded="false" aria-controls="units-menu">
           <svg class="icon-units" width="16" height="16" viewBox="0 0 16 16">
             <path
               fill="currentColor"
@@ -39,7 +39,7 @@
             />
           </svg>
         </button>
-        <div class="units-dropdown">
+        <div class="units-dropdown" id="units-menu">
           <div class="unit-group">
             <button class="switch-system">Switch to Imperial</button>
           </div>
@@ -64,7 +64,7 @@
     <main>
       <section id="search">
         <h1 class="title-main">How's the sky looking today?</h1>
-        <form action="submit">
+        <form role="search">
           <div class="search-field">
             <svg
               class="search-icon"
@@ -80,102 +80,35 @@
             <input
               type="search"
               name="search"
-              id=""
+              id="city-search" aria-label="Search for a city" minlength="2" required
               placeholder="Search for a place..."
               autocomplete="off"
             />
             <ul class="search-suggestions"></ul>
           </div>
           <button class="submit-button" type="submit">Search</button>
-        </form>
+        </form><p id="search-status" role="status" aria-live="polite"></p>
       </section>
-      <section id="api-error" class="no-results hidden">
+      <section id="api-error" class="no-results hidden" role="alert">
         <h2>Something went wrong</h2>
         <p>
           We couldn't connect to the server (API error).<br />
-          Please try again in a few minutes.
+          Please try again or search for another city.
         </p>
+        <button id="retry" class="submit-button" type="button">Try again</button>
       </section>
       <section id="no-results" class="no-results hidden">
         <h2>No search result found!</h2>
       </section>
-      <section id="grid" class="grid">
+      <section id="grid" class="grid hidden">
         <div class="grid-container">
           <div id="div1">
             <section class="hourly">
               <span class="hourly-top">
                 <h3>Hourly forecast</h3>
-                <div class="day-select" id="daySelect">
-                  <span class="selected-day">Monday</span>
-
-                  <ul class="day-options">
-                    <li data-day="sunday">Sunday</li>
-                    <li data-day="monday">Monday</li>
-                    <li data-day="tuesday">Tuesday</li>
-                    <li data-day="wednesday">Wednesday</li>
-                    <li data-day="thursday">Thursday</li>
-                    <li data-day="friday">Friday</li>
-                    <li data-day="saturday">Saturday</li>
-                  </ul>
-                </div>
+                <select class="day-select" id="daySelect" aria-label="Forecast day"></select>
               </span>
               <div class="hourly-list">
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
-                <div class="hour-card">
-                  <span>
-                    <img src="assets/images/icon-storm.webp" alt="" />
-                    <span class="hour">9 PM</span>
-                  </span>
-                  <span class="temp">22°</span>
-                </div>
               </div>
             </section>
           </div>
@@ -308,8 +241,8 @@
     <footer>
       Challenge by
       <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
-      Coded by <a href="https://github.com/Jaumceb">JceDev</a>.
+      Weather data by <a href="https://open-meteo.com/">Open-Meteo</a>. Coded by <a href="https://github.com/Jaumceb">JceDev</a>.
     </footer>
-    <script src="js/script.js"></script>
+    <script type="module" src="js/script.js"></script>
   </body>
 </html>
